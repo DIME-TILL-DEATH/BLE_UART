@@ -1,0 +1,12 @@
+eclipse.preferences.version=1
+encoding//APP/ble_uart_service/ble_uart_service.c=GBK
+encoding//APP/ble_uart_service/ble_uart_service.h=GBK
+encoding//APP/ch32v20x_it.c=GBK
+encoding//APP/include/peripheral.h=GBK
+encoding//APP/peripheral.c=UTF-8
+encoding//APP/peripheral_main.c=GBK
+encoding//APP/system_ch32v20x.c=GBK
+encoding//HAL/MCU.c=GBK
+encoding//Profile/gattprofile.c=GBK
+encoding//Profile/include/gattprofile.h=GBK
+encoding//SRC/Ld/Link.ld=GBK

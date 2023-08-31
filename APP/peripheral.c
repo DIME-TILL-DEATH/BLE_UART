@@ -8,7 +8,6 @@
 
 uint8_t Peripheral_TaskID = INVALID_TASK_ID; // Task ID for internal task/event processing
 
-//
 static uint8_t to_test_buffer[BLE_BUFF_MAX_LEN - 4 - 3];
 
 //The buffer length should be a power of 2
@@ -210,10 +209,13 @@ static uint8_t advertData[] = {
 
     // service UUID, to notify central devices what services are included
     // in this peripheral
-    3,                  // length of this data
-    GAP_ADTYPE_16BIT_MORE, // some of the UUID's, but not all
-    LO_UINT16(SIMPLEPROFILE_SERV_UUID),
-    HI_UINT16(SIMPLEPROFILE_SERV_UUID)
+//    3,                  // length of this data
+//    GAP_ADTYPE_16BIT_MORE, // some of the UUID's, but not all
+//    LO_UINT16(SIMPLEPROFILE_SERV_UUID),
+//    HI_UINT16(SIMPLEPROFILE_SERV_UUID)
+      17,                  // length of this data
+      GAP_ADTYPE_128BIT_COMPLETE,
+      UART_SERVICE_UUID
 };
 
 // GAP - SCAN RSP data (max size = 31 bytes)

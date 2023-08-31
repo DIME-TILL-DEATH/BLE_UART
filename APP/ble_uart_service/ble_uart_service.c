@@ -1,48 +1,29 @@
-/********************************** (C) COPYRIGHT *******************************
- * File Name          : ble_uart_service.c
- * Author             : WCH
- * Version            : V1.1
- * Date               : 2022/01/19
- * Description        :
- *********************************************************************************
- * Copyright (c) 2021 Nanjing Qinheng Microelectronics Co., Ltd.
- * Attention: This software (modified or not) and binary are used for 
- * microcontroller manufactured by Nanjing Qinheng Microelectronics.
- *******************************************************************************/
-
-/*********************************************************************
- * INCLUDES
- */
-
-#include "CONFIG.h"
-#include "gattprofile.h"
 #include "stdint.h"
+
+#include "config.h"
+#include "gattprofile.h"
 #include "ble_uart_service.h"
 
-/*********************************************************************
- * MACROS
- */
-
-/*********************************************************************
- * CONSTANTS
- */
 
 #define SERVAPP_NUM_ATTR_SUPPORTED    7
 
 #define RAWPASS_TX_VALUE_HANDLE       4
 #define RAWPASS_RX_VALUE_HANDLE       2
 
+
+
+// uuid's
 // ble_uart GATT Profile Service UUID
 const uint8_t ble_uart_ServiceUUID[ATT_UUID_SIZE] =
-    {0x9E, 0xCA, 0xDC, 0x24, 0x0E, 0xE5, 0xA9, 0xE0, 0x93, 0xF3, 0xA3, 0xB5, 0x01, 0x00, 0x40, 0x6E};
+    {UART_SERVICE_UUID};
 
 // Characteristic rx uuid
 const uint8_t ble_uart_RxCharUUID[ATT_UUID_SIZE] =
-    {0x9E, 0xCA, 0xDC, 0x24, 0x0E, 0xE5, 0xA9, 0xE0, 0x93, 0xF3, 0xA3, 0xB5, 0x02, 0x00, 0x40, 0x6E};
+    {UART_RXCHAR_UUID};
 
 // Characteristic tx uuid
 const uint8_t ble_uart_TxCharUUID[ATT_UUID_SIZE] =
-    {0x9E, 0xCA, 0xDC, 0x24, 0x0E, 0xE5, 0xA9, 0xE0, 0x93, 0xF3, 0xA3, 0xB5, 0x03, 0x00, 0x40, 0x6E};
+    {UART_TXCHAR_UUID};
 
 
 /*********************************************************************

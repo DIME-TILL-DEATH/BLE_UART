@@ -1,12 +1,9 @@
-#include "CONFIG.h"
+#include "config.h"
 #include "HAL.h"
 
-#include "gattprofile.h"
 #include "peripheral.h"
 
-/*********************************************************************
- * GLOBAL TYPEDEFS
- */
+
 __attribute__((aligned(4))) u32 MEM_BUF[BLE_MEMHEAP_SIZE / 4];
 
 #if(defined(BLE_MAC)) && (BLE_MAC == TRUE)
@@ -34,13 +31,7 @@ void Main_Circulation(void)
     }
 }
 
-/*******************************************************************************
- * Function Name  : main
- * Description    : Main function
- * Input          : None
- * Output         : None
- * Return         : None
- *******************************************************************************/
+
 int main(void)
 {
     Delay_Init();
@@ -57,5 +48,3 @@ int main(void)
     app_uart_init();
     Main_Circulation();
 }
-
-/******************************** endfile @ main ******************************/

@@ -17,13 +17,7 @@
 extern "C" {
 #endif
 
-/*********************************************************************
- * INCLUDES
- */
-
-/*********************************************************************
- * CONSTANTS
- */
+#include <stdint.h>
 
 // Peripheral Task Events
 #define SBP_START_DEVICE_EVT    0x0001
@@ -32,9 +26,7 @@ extern "C" {
 #define SBP_PARAM_UPDATE_EVT    0x0008
 #define UART_TO_BLE_SEND_EVT    0x0010
 
-/*********************************************************************
- * MACROS
- */
+
 typedef struct
 {
     uint16_t connHandle; // Connection handle of current connection
@@ -43,9 +35,7 @@ typedef struct
     uint16_t connTimeout;
 } peripheralConnItem_t;
 
-/*********************************************************************
- * FUNCTIONS
- */
+
 
 /*
  * Task Initialization for the BLE Application

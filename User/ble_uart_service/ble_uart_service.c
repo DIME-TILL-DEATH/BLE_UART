@@ -1,7 +1,6 @@
 #include "stdint.h"
 
 #include "config.h"
-#include "gattprofile.h"
 #include "ble_uart_service.h"
 
 
@@ -9,7 +8,6 @@
 
 #define RAWPASS_TX_VALUE_HANDLE       4
 #define RAWPASS_RX_VALUE_HANDLE       2
-
 
 
 // uuid's
@@ -61,7 +59,8 @@ static gattCharCfg_t ble_uart_TxCCCD[4];
  * Profile Attributes - Table
  */
 
-static gattAttribute_t ble_uart_ProfileAttrTbl[] = {
+static gattAttribute_t ble_uart_ProfileAttrTbl[] =
+{
     // Simple Profile Service
     {
         {ATT_BT_UUID_SIZE, primaryServiceUUID}, /* type */
@@ -103,7 +102,8 @@ static gattAttribute_t ble_uart_ProfileAttrTbl[] = {
         {ATT_BT_UUID_SIZE, clientCharCfgUUID},
         GATT_PERMIT_READ | GATT_PERMIT_WRITE,
         0,
-        (uint8_t *)ble_uart_TxCCCD},
+        (uint8_t *)ble_uart_TxCCCD
+    },
 
 };
 
@@ -305,10 +305,9 @@ uint8_t ble_uart_notify_is_ready(uint16_t connHandle)
     return (GATT_CLIENT_CFG_NOTIFY == GATTServApp_ReadCharCfg(connHandle, ble_uart_TxCCCD));
 }
 /*********************************************************************
- * @fn          BloodPressure_IMeasNotify
+ * @fn          ble_uart_notify
  *
- * @brief       Send a notification containing a bloodPressure
- *              measurement.
+ * @brief       Send a notification.
  *
  * @param       connHandle - connection handle
  * @param       pNoti - pointer to notification structure

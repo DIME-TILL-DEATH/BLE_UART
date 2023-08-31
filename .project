@@ -34,11 +34,6 @@
 			<type>2</type>
 			<locationURI>PROJECT_LOC/LIB</locationURI>
 		</link>
-		<link>
-			<name>SRC</name>
-			<type>2</type>
-			<locationURI>PROJECT_LOC/SRC</locationURI>
-		</link>
 	</linkedResources>
 	<filteredResources>
 		<filter>

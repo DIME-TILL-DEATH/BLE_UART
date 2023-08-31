@@ -1,7 +1,6 @@
-#include "config.h"
-
-#include "gattprofile.h"
 #include "peripheral.h"
+
+#include "config.h"
 
 #include "ble_uart_service.h"
 #include "app_drv_fifo.h"

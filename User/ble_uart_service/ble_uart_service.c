@@ -1,52 +1,32 @@
-#include "stdint.h"
-
 #include "config.h"
 #include "ble_uart_service.h"
-
 
 #define SERVAPP_NUM_ATTR_SUPPORTED    7
 
 #define RAWPASS_TX_VALUE_HANDLE       4
 #define RAWPASS_RX_VALUE_HANDLE       2
 
-
 // uuid's
-// ble_uart GATT Profile Service UUID
-const uint8_t ble_uart_ServiceUUID[ATT_UUID_SIZE] =
-    {UART_SERVICE_UUID};
-
-// Characteristic rx uuid
-const uint8_t ble_uart_RxCharUUID[ATT_UUID_SIZE] =
-    {UART_RXCHAR_UUID};
-
-// Characteristic tx uuid
-const uint8_t ble_uart_TxCharUUID[ATT_UUID_SIZE] =
-    {UART_TXCHAR_UUID};
-
-
-/*********************************************************************
- * LOCAL VARIABLES
- */
+const uint8_t ble_uart_ServiceUUID[ATT_UUID_SIZE] = {UART_SERVICE_UUID};
+const uint8_t ble_uart_RxCharUUID[ATT_UUID_SIZE] = {UART_RXCHAR_UUID};
+const uint8_t ble_uart_TxCharUUID[ATT_UUID_SIZE] = {UART_TXCHAR_UUID};
 
 static ble_uart_ProfileChangeCB_t ble_uart_AppCBs = NULL;
 
 /*********************************************************************
  * Profile Attributes - variables
- */
+ ********************************************************************/
 
 // Profile Service attribute
 static const gattAttrType_t ble_uart_Service = {ATT_UUID_SIZE, ble_uart_ServiceUUID};
 
 // Profile Characteristic 1 Properties
 static uint8_t ble_uart_RxCharProps = GATT_PROP_WRITE_NO_RSP| GATT_PROP_WRITE;
-//static uint8_t ble_uart_RxCharProps = GATT_PROP_WRITE_NO_RSP;
 
 // Characteristic 1 Value
 static uint8_t ble_uart_RxCharValue[BLE_UART_RX_BUFF_SIZE];
-//static uint8_t ble_uart_RxCharValue[1];
 
 // Profile Characteristic 2 Properties
-//static uint8_t ble_uart_TxCharProps = GATT_PROP_NOTIFY| GATT_PROP_INDICATE;
 static uint8_t ble_uart_TxCharProps = GATT_PROP_NOTIFY;
 
 // Characteristic 2 Value
@@ -61,7 +41,7 @@ static gattCharCfg_t ble_uart_TxCCCD[4];
 
 static gattAttribute_t ble_uart_ProfileAttrTbl[] =
 {
-    // Simple Profile Service
+    // Nordic UART Profile Service
     {
         {ATT_BT_UUID_SIZE, primaryServiceUUID}, /* type */
         GATT_PERMIT_READ,                       /* permissions */
@@ -74,21 +54,24 @@ static gattAttribute_t ble_uart_ProfileAttrTbl[] =
         {ATT_BT_UUID_SIZE, characterUUID},
         GATT_PERMIT_READ,
         0,
-        &ble_uart_RxCharProps},
+        &ble_uart_RxCharProps
+    },
 
     // Characteristic Value 1
     {
         {ATT_UUID_SIZE, ble_uart_RxCharUUID},
         GATT_PERMIT_WRITE,
         0,
-        &ble_uart_RxCharValue[0]},
+        &ble_uart_RxCharValue[0]
+    },
 
     // Characteristic 2 Declaration
     {
         {ATT_BT_UUID_SIZE, characterUUID},
         GATT_PERMIT_READ,
         0,
-        &ble_uart_TxCharProps},
+        &ble_uart_TxCharProps
+    },
 
     // Characteristic Value 2
     {
@@ -104,7 +87,6 @@ static gattAttribute_t ble_uart_ProfileAttrTbl[] =
         0,
         (uint8_t *)ble_uart_TxCCCD
     },
-
 };
 
 /*********************************************************************
@@ -119,8 +101,7 @@ static void ble_uart_HandleConnStatusCB(uint16_t connHandle, uint8_t changeType)
 
 /*********************************************************************
  * PROFILE CALLBACKS
- */
-// Simple Profile Service Callbacks
+ ********************************************************************/
 gattServiceCBs_t ble_uart_ProfileCBs = {
     ble_uart_ReadAttrCB,  // Read callback function pointer
     ble_uart_WriteAttrCB, // Write callback function pointer
@@ -147,18 +128,19 @@ bStatus_t ble_uart_add_service(ble_uart_ProfileChangeCB_t cb)
     uint8_t status = SUCCESS;
 
     GATTServApp_InitCharCfg(INVALID_CONNHANDLE, ble_uart_TxCCCD);
+
     // Register with Link DB to receive link status change callback
     linkDB_Register(ble_uart_HandleConnStatusCB);
 
-    //    ble_uart_TxCCCD.connHandle = INVALID_CONNHANDLE;
-    //    ble_uart_TxCCCD.value = 0;
+
     // Register GATT attribute list and CBs with GATT Server App
     status = GATTServApp_RegisterService(ble_uart_ProfileAttrTbl,
                                          GATT_NUM_ATTRS(ble_uart_ProfileAttrTbl),
                                          GATT_MAX_ENCRYPT_KEY_SIZE,
                                          &ble_uart_ProfileCBs);
-    if(status != SUCCESS)
-        PRINT("Add ble uart service failed!\n");
+
+    if(status != SUCCESS) printf("Add ble uart service failed!\n");
+
     ble_uart_AppCBs = cb;
 
     return (status);
@@ -182,7 +164,7 @@ static bStatus_t ble_uart_ReadAttrCB(uint16_t connHandle, gattAttribute_t *pAttr
                                      uint8_t *pValue, uint16_t *pLen, uint16_t offset, uint16_t maxLen, uint8_t method)
 {
     bStatus_t status = SUCCESS;
-    PRINT("ReadAttrCB\n");
+    printf("ReadAttrCB\n");
     // Make sure it's not a blob operation (no attributes in the profile are long)
     if(pAttr->type.len == ATT_BT_UUID_SIZE)
     {
@@ -203,7 +185,7 @@ static bStatus_t ble_uart_ReadAttrCB(uint16_t connHandle, gattAttribute_t *pAttr
         }
         else if(tmos_memcmp(pAttr->type.uuid, ble_uart_RxCharUUID, 16))
         {
-            PRINT("read tx char\n");
+            printf("read tx char\n");
         }
     }
 
@@ -211,7 +193,7 @@ static bStatus_t ble_uart_ReadAttrCB(uint16_t connHandle, gattAttribute_t *pAttr
 }
 
 /*********************************************************************
- * @fn      simpleProfile_WriteAttrCB
+ * @fn      ble_uart_WriteAttrCB
  *
  * @brief   Validate attribute data prior to a write operation
  *
@@ -228,12 +210,12 @@ static bStatus_t ble_uart_WriteAttrCB(uint16_t connHandle, gattAttribute_t *pAtt
                                       uint8_t *pValue, uint16_t len, uint16_t offset, uint8_t method)
 {
     bStatus_t status = SUCCESS;
-    //uint8_t notifyApp = 0xFF;
+
     // If attribute permissions require authorization to write, return error
     if(gattPermitAuthorWrite(pAttr->permissions))
     {
         // Insufficient authorization
-        return (ATT_ERR_INSUFFICIENT_AUTHOR);
+        return ATT_ERR_INSUFFICIENT_AUTHOR;
     }
 
     if(pAttr->type.len == ATT_BT_UUID_SIZE)
@@ -249,7 +231,6 @@ static bStatus_t ble_uart_WriteAttrCB(uint16_t connHandle, gattAttribute_t *pAtt
                 uint16_t         charCfg = BUILD_UINT16(pValue[0], pValue[1]);
                 ble_uart_evt_t evt;
 
-                //PRINT("CCCD set: [%d]\n", charCfg);
                 evt.type = (charCfg == GATT_CFG_NO_OPERATION) ? BLE_UART_EVT_TX_NOTI_DISABLED : BLE_UART_EVT_TX_NOTI_ENABLED;
                 ble_uart_AppCBs(connHandle, &evt);
             }
@@ -274,7 +255,7 @@ static bStatus_t ble_uart_WriteAttrCB(uint16_t connHandle, gattAttribute_t *pAtt
 }
 
 /*********************************************************************
- * @fn          simpleProfile_HandleConnStatusCB
+ * @fn          ble_uart_HandleConnStatusCB
  *
  * @brief       Simple Profile link status change handler function.
  *
@@ -304,6 +285,7 @@ uint8_t ble_uart_notify_is_ready(uint16_t connHandle)
 {
     return (GATT_CLIENT_CFG_NOTIFY == GATTServApp_ReadCharCfg(connHandle, ble_uart_TxCCCD));
 }
+
 /*********************************************************************
  * @fn          ble_uart_notify
  *
@@ -329,6 +311,3 @@ bStatus_t ble_uart_notify(uint16_t connHandle, attHandleValueNoti_t *pNoti, uint
     }
     return bleIncorrectMode;
 }
-
-/*********************************************************************
-*********************************************************************/

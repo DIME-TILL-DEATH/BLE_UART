@@ -1,15 +1,3 @@
-/********************************** (C) COPYRIGHT *******************************
- * File Name          : simpleGATTprofile.h
- * Author             : WCH
- * Version            : V1.1
- * Date               : 2022/01/19
- * Description        :
- *********************************************************************************
- * Copyright (c) 2021 Nanjing Qinheng Microelectronics Co., Ltd.
- * Attention: This software (modified or not) and binary are used for 
- * microcontroller manufactured by Nanjing Qinheng Microelectronics.
- *******************************************************************************/
-
 #ifndef _BLE_UART_SERVICE_H
 #define _BLE_UART_SERVICE_H
 
@@ -17,7 +5,7 @@
 extern "C" {
 #endif
 
-#include "stdint.h"
+#include <stdint.h>
 
 #define UART_SERVICE_UUID 0x9E, 0xCA, 0xDC, 0x24, 0x0E, 0xE5, 0xA9, 0xE0, 0x93, 0xF3, 0xA3, 0xB5, 0x01, 0x00, 0x40, 0x6E
 #define UART_RXCHAR_UUID 0x9E, 0xCA, 0xDC, 0x24, 0x0E, 0xE5, 0xA9, 0xE0, 0x93, 0xF3, 0xA3, 0xB5, 0x02, 0x00, 0x40, 0x6E
@@ -46,25 +34,10 @@ typedef struct
 
 typedef void (*ble_uart_ProfileChangeCB_t)(uint16_t connection_handle, ble_uart_evt_t *p_evt);
 
-/*********************************************************************
- * API FUNCTIONS
- */
+bStatus_t ble_uart_add_service(ble_uart_ProfileChangeCB_t cb);
+bStatus_t ble_uart_notify(uint16_t connHandle, attHandleValueNoti_t *pNoti, uint8_t taskId);
+uint8_t ble_uart_notify_is_ready(uint16_t connHandle);
 
-/*
- * ble_uart_AddService- Initializes the raw pass GATT Profile service by registering
- *          GATT attributes with the GATT server.
- *
- * @param   services - services to add. This is a bit map and can
- *                     contain more than one service.
- */
-
-extern bStatus_t ble_uart_add_service(ble_uart_ProfileChangeCB_t cb);
-
-extern uint8_t ble_uart_notify_is_ready(uint16_t connHandle);
-
-extern bStatus_t ble_uart_notify(uint16_t connHandle, attHandleValueNoti_t *pNoti, uint8_t taskId);
-/*********************************************************************
-*********************************************************************/
 
 #ifdef __cplusplus
 }

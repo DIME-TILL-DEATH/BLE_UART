@@ -1,4 +1,4 @@
-#include "peripheral.h"
+#include "ble.h"
 
 #include "config.h"
 
@@ -116,7 +116,7 @@ void USART3_IRQHandler(void)
         error = app_drv_fifo_write_from_same_addr(&app_uart_rx_fifo, (uint8_t *)&data, 1);
         if(error != APP_DRV_FIFO_RESULT_SUCCESS)
         {
-            PRINT("APP_DRV_FIFO_RESULT_NOT_MEM\r\n");
+            printf("APP_DRV_FIFO_RESULT_NOT_MEM\r\n");
         }
         uart_rx_flag = true;
     }
@@ -128,19 +128,19 @@ void on_bleuartServiceEvt(uint16_t connection_handle, ble_uart_evt_t *p_evt)
     switch(p_evt->type)
     {
         case BLE_UART_EVT_TX_NOTI_DISABLED:
-            PRINT("%02x:bleuart_EVT_TX_NOTI_DISABLED\r\n", connection_handle);
+            printf("%02x:bleuart_EVT_TX_NOTI_DISABLED\r\n", connection_handle);
             break;
         case BLE_UART_EVT_TX_NOTI_ENABLED:
-            PRINT("%02x:bleuart_EVT_TX_NOTI_ENABLED\r\n", connection_handle);
+            printf("%02x:bleuart_EVT_TX_NOTI_ENABLED\r\n", connection_handle);
             break;
         case BLE_UART_EVT_BLE_DATA_RECIEVED:
-            PRINT("BLE RX DATA len:%d\r\n", p_evt->data.length);
+            printf("BLE RX DATA len:%d\r\n", p_evt->data.length);
 
             //for notify back test
             //to ble
-            uint16_t to_write_length = p_evt->data.length;
-            app_drv_fifo_write(&app_uart_rx_fifo, (uint8_t *)p_evt->data.p_data, &to_write_length);
-            tmos_start_task(Peripheral_TaskID, UART_TO_BLE_SEND_EVT, 2);
+//            uint16_t to_write_length = p_evt->data.length;
+//            app_drv_fifo_write(&app_uart_rx_fifo, (uint8_t *)p_evt->data.p_data, &to_write_length);
+//            tmos_start_task(Peripheral_TaskID, UART_TO_BLE_SEND_EVT, 2);
             //end of nofify back test
 
             //ble to uart
@@ -155,38 +155,6 @@ void on_bleuartServiceEvt(uint16_t connection_handle, ble_uart_evt_t *p_evt)
 /*********************************************************************
     BLE
 /*********************************************************************/
-
-// How often to perform periodic event
-#define SBP_PERIODIC_EVT_PERIOD              1600
-
-// How often to perform read rssi event
-#define SBP_READ_RSSI_EVT_PERIOD             3200
-
-// Parameter update delay
-#define SBP_PARAM_UPDATE_DELAY               6400
-
-// What is the advertising interval when device is discoverable (units of 625us, 80=50ms)
-#define DEFAULT_ADVERTISING_INTERVAL         160
-
-// Limited discoverable mode advertises for 30.72s, and then stops
-// General discoverable mode advertises indefinitely
-#define DEFAULT_DISCOVERABLE_MODE            GAP_ADTYPE_FLAGS_GENERAL
-
-// Minimum connection interval (units of 1.25ms, 10=12.5ms)
-#define DEFAULT_DESIRED_MIN_CONN_INTERVAL    8
-
-// Maximum connection interval (units of 1.25ms, 100=125ms)
-#define DEFAULT_DESIRED_MAX_CONN_INTERVAL    20
-
-// Slave latency to use parameter update
-#define DEFAULT_DESIRED_SLAVE_LATENCY        0
-
-// Supervision timeout value (units of 10ms, 100=1s)
-#define DEFAULT_DESIRED_CONN_TIMEOUT         100
-
-// Company Identifier: WCH
-#define WCH_COMPANY_ID                       0x07D7
-
 
 //for send to ble
 typedef enum
@@ -208,10 +176,6 @@ static uint8_t advertData[] = {
 
     // service UUID, to notify central devices what services are included
     // in this peripheral
-//    3,                  // length of this data
-//    GAP_ADTYPE_16BIT_MORE, // some of the UUID's, but not all
-//    LO_UINT16(SIMPLEPROFILE_SERV_UUID),
-//    HI_UINT16(SIMPLEPROFILE_SERV_UUID)
       17,                  // length of this data
       GAP_ADTYPE_128BIT_COMPLETE,
       UART_SERVICE_UUID
@@ -248,22 +212,22 @@ static peripheralConnItem_t peripheralConnList;
  * LOCAL FUNCTIONS
  */
 static void Peripheral_ProcessTMOSMsg(tmos_event_hdr_t *pMsg);
-static void peripheralStateNotificationCB(gapRole_States_t newState, gapRoleEvent_t *pEvent);
+static void BLE_StateNotificationCB(gapRole_States_t newState, gapRoleEvent_t *pEvent);
 
-static void peripheralParamUpdateCB(uint16_t connHandle, uint16_t connInterval,
+static void BLE_ParamUpdateCB(uint16_t connHandle, uint16_t connInterval,
                                     uint16_t connSlaveLatency, uint16_t connTimeout);
 static void peripheralInitConnItem(peripheralConnItem_t *peripheralConnList);
-static void peripheralRssiCB(uint16_t connHandle, int8_t rssi);
+static void BLE_RssiCB(uint16_t connHandle, int8_t rssi);
 
 /*********************************************************************
  * PROFILE CALLBACKS
- */
+ *********************************************************************/
 
 // GAP Role Callbacks
 static gapRolesCBs_t Peripheral_PeripheralCBs = {
-    peripheralStateNotificationCB, // Profile State Change Callbacks
-    peripheralRssiCB,              // When a valid RSSI is read from controller (not used by application)
-    peripheralParamUpdateCB};
+    BLE_StateNotificationCB, // Profile State Change Callbacks
+    BLE_RssiCB,              // When a valid RSSI is read from controller (not used by application)
+    BLE_ParamUpdateCB};
 
 // Broadcast Callbacks
 static gapRolesBroadcasterCBs_t Broadcaster_BroadcasterCBs = {
@@ -279,7 +243,7 @@ static gapBondCBs_t Peripheral_BondMgrCBs = {
 
 /*********************************************************************
  * PUBLIC FUNCTIONS
- */
+ *********************************************************************/
 
 /*********************************************************************
  * @fn      Peripheral_Init
@@ -295,7 +259,7 @@ static gapBondCBs_t Peripheral_BondMgrCBs = {
  *
  * @return  none
  */
-void Peripheral_Init()
+void Ble_Init()
 {
     Peripheral_TaskID = TMOS_ProcessEventRegister(Peripheral_ProcessEvent);
 
@@ -321,10 +285,10 @@ void Peripheral_Init()
     GAP_SetParamValue(TGAP_DISC_ADV_INT_MAX, advInt);
 
     // Setup the GAP Bond Manager
-    uint32_t passkey = 0; // passkey "000000"
+    uint32_t passkey = 0;
     uint8_t  pairMode = GAPBOND_PAIRING_MODE_WAIT_FOR_REQ;
     uint8_t  mitm = TRUE;
-    uint8_t  bonding = TRUE;
+    uint8_t  bonding = FALSE; // don't save bonding info
     uint8_t  ioCap = GAPBOND_IO_CAP_DISPLAY_ONLY;
     GAPBondMgr_SetParameter(GAPBOND_PERI_DEFAULT_PASSCODE, sizeof(uint32_t), &passkey);
     GAPBondMgr_SetParameter(GAPBOND_PERI_PAIRING_MODE, sizeof(uint8_t), &pairMode);
@@ -365,11 +329,6 @@ static void peripheralInitConnItem(peripheralConnItem_t *peripheralConnList)
     peripheralConnList->connTimeout = 0;
 }
 
-uint32_t get_fattime(void)
-{
-    return 0;
-}
-
 /*********************************************************************
  * @fn      Peripheral_ProcessEvent
  *
@@ -386,7 +345,6 @@ uint32_t get_fattime(void)
 uint16_t Peripheral_ProcessEvent(uint8_t task_id, uint16_t events)
 {
     static attHandleValueNoti_t noti;
-    //  VOID task_id; // TMOS required parameter that isn't used in this function
 
     if(events & SYS_EVENT_MSG)
     {
@@ -408,6 +366,7 @@ uint16_t Peripheral_ProcessEvent(uint8_t task_id, uint16_t events)
         GAPRole_PeripheralStartDevice(Peripheral_TaskID, &Peripheral_BondMgrCBs, &Peripheral_PeripheralCBs);
         return (events ^ SBP_START_DEVICE_EVT);
     }
+
     if(events & SBP_PARAM_UPDATE_EVT)
     {
         // Send connect param update request
@@ -417,21 +376,23 @@ uint16_t Peripheral_ProcessEvent(uint8_t task_id, uint16_t events)
                                              DEFAULT_DESIRED_SLAVE_LATENCY,
                                              DEFAULT_DESIRED_CONN_TIMEOUT,
                                              Peripheral_TaskID);
-
-        //        GAPRole_PeripheralConnParamUpdateReq( peripheralConnList.connHandle,
-        //                                              10,
-        //                                              20,
-        //                                              0,
-        //                                              400,
-        //                                              Peripheral_TaskID);
-
         return (events ^ SBP_PARAM_UPDATE_EVT);
+    }
+
+    if(events & SBP_PERIODIC_EVT)
+    {
+        if(SBP_PERIODIC_EVT_PERIOD)
+        {
+            tmos_start_task(Peripheral_TaskID, SBP_PERIODIC_EVT, SBP_PERIODIC_EVT_PERIOD);
+        }
+
+        return (events ^ SBP_PERIODIC_EVT);
     }
 
     if(events & UART_TO_BLE_SEND_EVT)
     {
         static uint16_t read_length = 0;
-        ;
+
         uint8_t result = 0xff;
         switch(send_to_ble_state)
         {
@@ -451,7 +412,7 @@ uint16_t Peripheral_ProcessEvent(uint8_t task_id, uint16_t events)
 
                 if(app_drv_fifo_length(&app_uart_rx_fifo) >= read_length)
                 {
-                    PRINT("FIFO_LEN:%d\r\n", app_drv_fifo_length(&app_uart_rx_fifo));
+                    printf("FIFO_LEN:%d\r\n", app_drv_fifo_length(&app_uart_rx_fifo));
                     result = app_drv_fifo_read(&app_uart_rx_fifo, to_test_buffer, &read_length);
                     uart_to_ble_send_evt_cnt = 0;
                 }
@@ -466,7 +427,7 @@ uint16_t Peripheral_ProcessEvent(uint8_t task_id, uint16_t events)
                     {
                         tmos_start_task(Peripheral_TaskID, UART_TO_BLE_SEND_EVT, 4);
                         uart_to_ble_send_evt_cnt++;
-                        PRINT("NO TIME OUT\r\n");
+                        printf("NO TIME OUT\r\n");
                     }
                 }
 
@@ -480,7 +441,7 @@ uint16_t Peripheral_ProcessEvent(uint8_t task_id, uint16_t events)
                         result = ble_uart_notify(peripheralConnList.connHandle, &noti, 0);
                         if(result != SUCCESS)
                         {
-                            PRINT("R1:%02x\r\n", result);
+                            printf("R1:%02x\r\n", result);
                             send_to_ble_state = SEND_TO_BLE_SEND_FAILED;
                             GATT_bm_free((gattMsg_t *)&noti, ATT_HANDLE_VALUE_NOTI);
                             tmos_start_task(Peripheral_TaskID, UART_TO_BLE_SEND_EVT, 2);
@@ -488,8 +449,6 @@ uint16_t Peripheral_ProcessEvent(uint8_t task_id, uint16_t events)
                         else
                         {
                             send_to_ble_state = SEND_TO_BLE_TO_SEND;
-                            //app_fifo_write(&app_uart_tx_fifo,to_test_buffer,&read_length);
-                            //app_drv_fifo_write(&app_uart_tx_fifo,to_test_buffer,&read_length);
                             read_length = 0;
                             tmos_start_task(Peripheral_TaskID, UART_TO_BLE_SEND_EVT, 2);
                         }
@@ -516,7 +475,7 @@ uint16_t Peripheral_ProcessEvent(uint8_t task_id, uint16_t events)
                     result = ble_uart_notify(peripheralConnList.connHandle, &noti, 0);
                     if(result != SUCCESS)
                     {
-                        PRINT("R2:%02x\r\n", result);
+                        printf("R2:%02x\r\n", result);
                         send_to_ble_state = SEND_TO_BLE_SEND_FAILED;
                         GATT_bm_free((gattMsg_t *)&noti, ATT_HANDLE_VALUE_NOTI);
                         tmos_start_task(Peripheral_TaskID, UART_TO_BLE_SEND_EVT, 2);
@@ -571,7 +530,7 @@ static void Peripheral_ProcessTMOSMsg(tmos_event_hdr_t *pMsg)
  *
  * @return  none
  */
-static void Peripheral_LinkEstablished(gapRoleEvent_t *pEvent)
+static void BLE_LinkEstablished(gapRoleEvent_t *pEvent)
 {
     gapEstLinkReqEvent_t *event = (gapEstLinkReqEvent_t *)pEvent;
 
@@ -579,7 +538,7 @@ static void Peripheral_LinkEstablished(gapRoleEvent_t *pEvent)
     if(peripheralConnList.connHandle != GAP_CONNHANDLE_INIT)
     {
         GAPRole_TerminateLink(pEvent->linkCmpl.connectionHandle);
-        PRINT("Connection max...\n");
+        printf("Connection max...\n");
     }
     else
     {
@@ -588,10 +547,13 @@ static void Peripheral_LinkEstablished(gapRoleEvent_t *pEvent)
         peripheralConnList.connSlaveLatency = event->connLatency;
         peripheralConnList.connTimeout = event->connTimeout;
 
+        // Set periodic task
+        tmos_start_task(Peripheral_TaskID, SBP_PERIODIC_EVT, SBP_PERIODIC_EVT_PERIOD);
+
         // Set timer for param update event
         tmos_start_task(Peripheral_TaskID, SBP_PARAM_UPDATE_EVT, SBP_PARAM_UPDATE_DELAY);
 
-        PRINT("Conn %x - Int %x \n", event->connectionHandle, event->connInterval);
+        printf("Connection %x - Interval %x \n", event->connectionHandle, event->connInterval);
     }
 }
 
@@ -604,7 +566,7 @@ static void Peripheral_LinkEstablished(gapRoleEvent_t *pEvent)
  *
  * @return  none
  */
-static void Peripheral_LinkTerminated(gapRoleEvent_t *pEvent)
+static void BLE_LinkTerminated(gapRoleEvent_t *pEvent)
 {
     gapTerminateLinkEvent_t *event = (gapTerminateLinkEvent_t *)pEvent;
 
@@ -615,15 +577,15 @@ static void Peripheral_LinkTerminated(gapRoleEvent_t *pEvent)
         peripheralConnList.connSlaveLatency = 0;
         peripheralConnList.connTimeout = 0;
 
+        tmos_stop_task(Peripheral_TaskID, SBP_PERIODIC_EVT);
+
         // Restart advertising
-        {
-            uint8_t advertising_enable = TRUE;
-            GAPRole_SetParameter(GAPROLE_ADVERT_ENABLED, sizeof(uint8_t), &advertising_enable);
-        }
+        uint8_t advertising_enable = TRUE;
+        GAPRole_SetParameter(GAPROLE_ADVERT_ENABLED, sizeof(uint8_t), &advertising_enable);
     }
     else
     {
-        PRINT("ERR..\n");
+        printf("ERR..\n");
     }
 }
 
@@ -637,9 +599,9 @@ static void Peripheral_LinkTerminated(gapRoleEvent_t *pEvent)
  *
  * @return  none
  */
-static void peripheralRssiCB(uint16_t connHandle, int8_t rssi)
+static void BLE_RssiCB(uint16_t connHandle, int8_t rssi)
 {
-    PRINT("RSSI -%d dB Conn  %x \n", -rssi, connHandle);
+    printf("RSSI -%d dB Conn  %x \n", -rssi, connHandle);
 }
 
 /*********************************************************************
@@ -654,7 +616,7 @@ static void peripheralRssiCB(uint16_t connHandle, int8_t rssi)
  *
  * @return  none
  */
-static void peripheralParamUpdateCB(uint16_t connHandle, uint16_t connInterval,
+static void BLE_ParamUpdateCB(uint16_t connHandle, uint16_t connInterval,
                                     uint16_t connSlaveLatency, uint16_t connTimeout)
 {
     if(connHandle == peripheralConnList.connHandle)
@@ -663,11 +625,12 @@ static void peripheralParamUpdateCB(uint16_t connHandle, uint16_t connInterval,
         peripheralConnList.connSlaveLatency = connSlaveLatency;
         peripheralConnList.connTimeout = connTimeout;
 
-        PRINT("Update %x - Int %x \n", connHandle, connInterval);
+        printf("Update connection params(Handle: %x). Interval: %d, latency: %d, timeout: %d\n",
+                                        connHandle, connInterval, connSlaveLatency, connTimeout);
     }
     else
     {
-        PRINT("peripheralParamUpdateCB err..\n");
+        printf("peripheralParamUpdateCB err...\n");
     }
 }
 
@@ -680,69 +643,66 @@ static void peripheralParamUpdateCB(uint16_t connHandle, uint16_t connInterval,
  *
  * @return  none
  */
-static void peripheralStateNotificationCB(gapRole_States_t newState, gapRoleEvent_t *pEvent)
+static void BLE_StateNotificationCB(gapRole_States_t newState, gapRoleEvent_t *pEvent)
 {
     switch(newState & GAPROLE_STATE_ADV_MASK)
     {
         case GAPROLE_STARTED:
-            PRINT("Initialized..\n");
+            printf("Initialized...\n");
             break;
 
         case GAPROLE_ADVERTISING:
             if(pEvent->gap.opcode == GAP_LINK_TERMINATED_EVENT)
             {
-                Peripheral_LinkTerminated(pEvent);
+                BLE_LinkTerminated(pEvent);
             }
-            PRINT("Advertising..\n");
+            printf("Advertising...\n");
             break;
 
         case GAPROLE_CONNECTED:
             if(pEvent->gap.opcode == GAP_LINK_ESTABLISHED_EVENT)
             {
-                Peripheral_LinkEstablished(pEvent);
-                PRINT("Connected..\n");
+                BLE_LinkEstablished(pEvent);
+                printf("Connected...\n");
             }
             break;
 
         case GAPROLE_CONNECTED_ADV:
-            PRINT("Connected Advertising..\n");
+            printf("Connected Advertising...\n");
             break;
 
         case GAPROLE_WAITING:
             if(pEvent->gap.opcode == GAP_END_DISCOVERABLE_DONE_EVENT)
             {
-                PRINT("Waiting for advertising..\n");
+                printf("Waiting for advertising...\n");
             }
             else if(pEvent->gap.opcode == GAP_LINK_TERMINATED_EVENT)
             {
-                Peripheral_LinkTerminated(pEvent);
-                PRINT("Disconnected.. Reason:%x\n", pEvent->linkTerminate.reason);
+                BLE_LinkTerminated(pEvent);
+                printf("Disconnected... Reason:%x\n", pEvent->linkTerminate.reason);
             }
             else if(pEvent->gap.opcode == GAP_LINK_ESTABLISHED_EVENT)
             {
                 if(pEvent->gap.hdr.status != SUCCESS)
                 {
-                    PRINT("Waiting for advertising..\n");
+                    printf("Waiting for advertising...\n");
                 }
                 else
                 {
-                    PRINT("Error..\n");
+                    printf("Error...\n");
                 }
             }
             else
             {
-                PRINT("Error..%x\n", pEvent->gap.opcode);
+                printf("Error...%x\n", pEvent->gap.opcode);
             }
             break;
 
         case GAPROLE_ERROR:
-            PRINT("Error..\n");
+            printf("Error...\n");
             break;
 
         default:
             break;
     }
 }
-
-/*********************************************************************
-*********************************************************************/

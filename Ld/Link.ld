@@ -32,14 +32,14 @@ SECTIONS
 		_einit = .;
 	} >FLASH AT>FLASH
 
-  .vector :
-  {
-      *(.vector);
-	  . = ALIGN(64);
+	.vector :
+	{
+		*(.vector);
+		. = ALIGN(64);
 		KEEP(*(SORT_NONE(.handle_reset)))
-  } >FLASH AT>FLASH
+	} >FLASH AT>FLASH
   
-     .highcode : 
+    .highcode : 
     {
         . = ALIGN(4);
         *(.highcode);

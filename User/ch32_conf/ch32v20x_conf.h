@@ -32,6 +32,6 @@
 #include "ch32v20x_usart.h"
 #include "ch32v20x_wwdg.h"
 #include "ch32v20x_misc.h"
-#include "../ch32_conf/ch32v20x_it.h"
+#include "ch32v20x_it.h"
 
 #endif /* __CH32V20x_CONF_H */

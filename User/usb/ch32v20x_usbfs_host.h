@@ -11,8 +11,8 @@
 *******************************************************************************/
 
 
-#ifndef __CH32V20x_USBFS_HOST_H__
-#define __CH32V20x_USBFS_HOST_H__
+#ifndef __MY_CH32V20x_USBFS_HOST_H__
+#define __MY_CH32V20x_USBFS_HOST_H__
 
 #ifdef __cplusplus
  extern "C" {
@@ -23,147 +23,145 @@
 #include "ch32v20x.h"
 #include "ch32v20x_usb.h"
 
- /******************************************************************************/
- /* USB Host Defines */
+#include "usb_defines.h"
 
- #define DEF_TOTAL_ROOT_HUB          1
- #define DEF_USBFS_PORT_EN           1
- #define DEF_USBFS_PORT_INDEX        0x00
- #define DEF_ONE_USB_SUP_DEV_TOTAL   5
- #define DEF_NEXT_HUB_PORT_NUM_MAX   4
- #define DEF_INTERFACE_NUM_MAX       4
+ //endpoint
+#define DEF_ENDP_0     0
+#define DEF_ENDP_1     1
+#define DEF_ENDP_2     2
+#define DEF_ENDP_3     3
+#define DEF_ENDP_4     4
+#define DEF_ENDP_5     5
+#define DEF_ENDP_6     6
+#define DEF_ENDP_7     7
+#define DEF_ENDP_8     8
+#define DEF_ENDP_9     9
+#define DEF_ENDP_10    10
+#define DEF_ENDP_11    11
+#define DEF_ENDP_12    12
+#define DEF_ENDP_13    13
+#define DEF_ENDP_14    14
+#define DEF_ENDP_15    15
 
- /* USB Root Device Status */
- #define ROOT_DEV_DISCONNECT         0
- #define ROOT_DEV_CONNECTED          1
- #define ROOT_DEV_FAILED             2
- #define ROOT_DEV_SUCCESS            3
+/******************************************************************************/
+/* USB Host Defines */
 
- /* USB Device Address */
- #define USB_DEVICE_ADDR             0x02
+#define DEF_TOTAL_ROOT_HUB          1
+#define DEF_USBFS_PORT_EN           1
+#define DEF_USBFS_PORT_INDEX        0x00
+#define DEF_ONE_USB_SUP_DEV_TOTAL   5
+#define DEF_NEXT_HUB_PORT_NUM_MAX   4
+#define DEF_INTERFACE_NUM_MAX       4
 
- /* USB Speed */
- #define USB_LOW_SPEED               0x00
- #define USB_FULL_SPEED              0x01
- #define USB_HIGH_SPEED              0x02
- #define USB_SPEED_CHECK_ERR         0xFF
+/* USB Root Device Status */
+#define ROOT_DEV_DISCONNECT         0
+#define ROOT_DEV_CONNECTED          1
+#define ROOT_DEV_FAILED             2
+#define ROOT_DEV_SUCCESS            3
 
- /* Configuration Descriptor Type */
- #define DEF_DECR_CONFIG             0x02
- #define DEF_DECR_INTERFACE          0x04
- #define DEF_DECR_ENDPOINT           0x05
- #define DEF_DECR_HID                0x21
+/* USB Device Address */
+#define USB_DEVICE_ADDR             0x02
 
- /* USB Communication Status Code */
- #define ERR_SUCCESS                 0x00
- #define ERR_USB_CONNECT             0x15
- #define ERR_USB_DISCON              0x16
- #define ERR_USB_BUF_OVER            0x17
- #define ERR_USB_DISK_ERR            0x1F
- #define ERR_USB_TRANSFER            0x20
- #define ERR_USB_UNSUPPORT           0xFB
- #define ERR_USB_UNAVAILABLE         0xFC
- #define ERR_USB_UNKNOWN             0xFE
+/* USB Speed */
+#define USB_LOW_SPEED               0x00
+#define USB_FULL_SPEED              0x01
+#define USB_HIGH_SPEED              0x02
+#define USB_SPEED_CHECK_ERR         0xFF
 
- /* USB Device Enumeration Status Code */
- #define DEF_DEV_DESCR_GETFAIL       0x45
- #define DEF_DEV_ADDR_SETFAIL        0x46
- #define DEF_CFG_DESCR_GETFAIL       0x47
- #define DEF_REP_DESCR_GETFAIL       0x48
- #define DEF_CFG_VALUE_SETFAIL       0x49
- #define DEF_DEV_TYPE_UNKNOWN        0xFF
+/* Configuration Descriptor Type */
+#define DEF_DECR_CONFIG             0x02
+#define DEF_DECR_INTERFACE          0x04
+#define DEF_DECR_ENDPOINT           0x05
+#define DEF_DECR_HID                0x21
 
- /* USB Communication Time */
- #define DEF_BUS_RESET_TIME          11          // USB bus reset time
- #define DEF_RE_ATTACH_TIMEOUT       100         // Wait for the USB device to reconnect after reset, 100mS timeout
- #define DEF_WAIT_USB_TRANSFER_CNT   1000        // Wait for the USB transfer to complete
- #define DEF_CTRL_TRANS_TIMEOVER_CNT 200000/20   // Control transmission delay timing
+/* USB Communication Status Code */
+#define ERR_SUCCESS                 0x00
+#define ERR_USB_CONNECT             0x15
+#define ERR_USB_DISCON              0x16
+#define ERR_USB_BUF_OVER            0x17
+#define ERR_USB_DISK_ERR            0x1F
+#define ERR_USB_TRANSFER            0x20
+#define ERR_USB_UNSUPPORT           0xFB
+#define ERR_USB_UNAVAILABLE         0xFC
+#define ERR_USB_UNKNOWN             0xFE
 
-/*******************************************************************************/
-/* Macro Definition */
+/* USB Device Enumeration Status Code */
+#define DEF_DEV_DESCR_GETFAIL       0x45
+#define DEF_DEV_ADDR_SETFAIL        0x46
+#define DEF_CFG_DESCR_GETFAIL       0x47
+#define DEF_REP_DESCR_GETFAIL       0x48
+#define DEF_CFG_VALUE_SETFAIL       0x49
+#define DEF_DEV_TYPE_UNKNOWN        0xFF
 
-/* USB Setup Request */
-#define pUSBFS_SetupRequest        ((PUSB_SETUP_REQ)endpTXbuf)
+/* USB Communication Time */
+#define DEF_BUS_RESET_TIME          11          // USB bus reset time
+#define DEF_RE_ATTACH_TIMEOUT       100         // Wait for the USB device to reconnect after reset, 100mS timeout
+#define DEF_WAIT_USB_TRANSFER_CNT   1000        // Wait for the USB transfer to complete
+#define DEF_CTRL_TRANS_TIMEOVER_CNT 200000/20   // Control transmission delay timing
 
 /* USB Buffer Size */
 #ifndef USBFS_MAX_PACKET_SIZE
-#define USBFS_MAX_PACKET_SIZE      64
+#define USBFS_MAX_PACKET_SIZE 64
 #endif
 
-/*******************************************************************************/
-/* Constant Definition */
-#ifndef DEF_USB_GEN_ENUM_CMD
-#define DEF_USB_GEN_ENUM_CMD
-/* Get Device Descriptor Command Packet */
-__attribute__((aligned(4))) static const uint8_t  SetupGetDevDesc[ ] =
-{
-    USB_REQ_TYP_IN, USB_GET_DESCRIPTOR, 0x00, USB_DESCR_TYP_DEVICE, 0x00, 0x00, sizeof( USB_DEV_DESCR ), 0x00
-};
+ typedef struct __attribute__((packed)) _ENDP_INFO
+ {
+     uint16_t  endpMaxSize;
+     uint8_t   endpAddress;
+     uint8_t   direction;
+     uint8_t   type;
+     uint8_t   toggle;
+ }USBENDP_INFO;
 
-/* Get Configuration Descriptor Command Packet */
-__attribute__((aligned(4))) static const uint8_t SetupGetCfgDesc[ ] =
-{
-    USB_REQ_TYP_IN, USB_GET_DESCRIPTOR, 0x00, USB_DESCR_TYP_CONFIG, 0x00, 0x00, 0x04, 0x00
-};
+ typedef struct __attribute__((packed)) _ITF_INFO
+ {
+     USBENDP_INFO*   endpInfo;
+     uint8_t         endpCount;
 
-/* Get String Descriptor Command Packet */
-__attribute__((aligned(4))) static const uint8_t SetupGetStrDesc[ ] =
-{
-    USB_REQ_TYP_IN, USB_GET_DESCRIPTOR, 0x00, USB_DESCR_TYP_STRING, 0x09, 0x04, 0x04, 0x00
-};
+     uint8_t     itfNumber;
+     uint8_t     itfClass;
+ }USBITF_INFO;
 
-/* Set USB Address Command Packet */
-__attribute__((aligned(4))) static const uint8_t SetupSetAddr[ ] =
-{
-    USB_REQ_TYP_OUT, USB_SET_ADDRESS, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-};
+ typedef struct  __attribute__((packed)) _DEV_INFO
+ {
+     uint8_t   devClass;
+     uint8_t   devSubClass;
+     uint16_t  VID;
+     uint16_t  PID;
 
-/* Set USB Configuration Command Packet */
-__attribute__((aligned(4))) static const uint8_t SetupSetConfig[ ] =
-{
-    USB_REQ_TYP_OUT, USB_SET_CONFIGURATION, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-};
+     char* manufacturerString;
+     uint8_t manufacturerStringLen;
+     char* productString;
+     uint8_t productStringLen;
 
-/* Clear Endpoint STALL Command Packet */
-__attribute__((aligned(4))) static const uint8_t SetupClearEndpStall[ ] =
-{
-    USB_REQ_TYP_OUT | USB_REQ_RECIP_ENDP, USB_CLEAR_FEATURE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-};
+     USBITF_INFO* itfInfo;
+     uint8_t     itfNum;
 
-/* Set Device Interface Command Packet */
-__attribute__((aligned(4))) static const uint8_t SetupSetInterface[ ] =
-{
-    USB_REQ_RECIP_INTERF, USB_SET_INTERFACE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-};
-#endif
+     uint8_t   endp0Size;
+     uint8_t   devCfgValue;
 
-/*******************************************************************************/
-/* Variable Declaration */
-extern __attribute__((aligned(4))) uint8_t  endpTXbuf[ ];
-extern __attribute__((aligned(4))) uint8_t  endpRXbuf[ ];
+     uint8_t   devStatus;
+     uint8_t   devAddress;
+ }USBDEV_INFO;
 
-/*******************************************************************************/
+ /*******************************************************************************/
+ /* Variable Declaration */
+ extern __attribute__((aligned(4))) uint8_t  endpRXbuf[ ];
+ extern __attribute__((aligned(4))) uint8_t  endpTXbuf[ ];
 
-void USBFS_RCC_Init();
-extern void USBFS_Host_Init( FunctionalState sta );
-extern uint8_t USBFSH_CheckRootHubPortStatus( uint8_t dev_sta );
-extern uint8_t USBFSH_CheckRootHubPortEnable( void );
-extern uint8_t USBFSH_CheckRootHubPortSpeed( void );
-extern void USBFSH_SetSelfAddr( uint8_t addr );
-extern void USBFSH_SetSelfSpeed( uint8_t speed );
-extern void USBFSH_ResetRootHubPort( uint8_t mode );
-extern uint8_t USBFSH_EnableRootHubPort( uint8_t *pspeed );
-extern uint8_t USBFSH_Transact( uint8_t endp_pid, uint8_t endp_tog, uint16_t timeout );
-extern uint8_t USBFSH_CtrlTransfer( uint8_t ep0_size, uint8_t *pbuf, uint16_t *plen );
-extern uint8_t USBFSH_GetDeviceDescr( uint8_t *pep0_size, uint8_t *pbuf );
-extern uint8_t USBFSH_GetConfigDescr( uint8_t ep0_size, uint8_t *pbuf, uint16_t buf_len, uint16_t *pcfg_len );
-extern uint8_t USBFSH_GetStrDescr( uint8_t ep0_size, uint8_t str_num, uint8_t *pbuf );
-extern uint8_t USBFSH_SetUsbAddress( uint8_t ep0_size, uint8_t addr );
-extern uint8_t USBFSH_SetUsbConfig( uint8_t ep0_size, uint8_t cfg_val );
-extern uint8_t USBFSH_ClearEndpStall( uint8_t ep0_size, uint8_t endp_num );
-extern uint8_t USBFSH_GetEndpData( uint8_t endp_num, uint8_t *pendp_tog, uint8_t *pbuf, uint16_t *plen );
-extern uint8_t USBFSH_SendEndpData( uint8_t endp_num, uint8_t *pendp_tog, uint8_t *pbuf, uint16_t len );
 
+void USB_RCCInit();
+void USB_HostInit(FunctionalState state);
+void USB_SetBusReset();
+void USB_ResetRootHubPort();
+void USB_SetSelfAddr(uint8_t address);
+void USB_SetSelfSpeed(uint8_t speed);
+
+uint8_t USB_RawTransaction(uint8_t endpPid, uint8_t endpToggle, uint32_t timeout);
+uint8_t USB_HostCtrlTransfer(USBDEV_INFO* usbDevice_ptr, USB_SETUP_REQ* request_ptr, uint8_t** replyBuf_ptr);
+
+uint8_t USB_GetEndpData(USBENDP_INFO* endpInfo_ptr, uint8_t *buf_ptr, uint16_t *len_ptr);
+uint8_t USB_SendEndpData(USBENDP_INFO* endpInfo_ptr, uint8_t *buf_ptr, int16_t len);
 
 #ifdef __cplusplus
 }

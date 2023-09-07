@@ -11,8 +11,8 @@
 *******************************************************************************/
 
 
-#ifndef __CH32V20x_USB_H
-#define __CH32V20x_USB_H
+#ifndef __MY_CH32V20x_USB_H
+#define __MY_CH32V20x_USB_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -115,7 +115,7 @@
 #define USB_DESCR_TYP_DEVICE        0x01
 #define USB_DESCR_TYP_CONFIG        0x02
 #define USB_DESCR_TYP_STRING        0x03
-#define USB_DESCR_TYP_INTERF        0x04
+#define USB_DESCR_TYP_ITF           0x04
 #define USB_DESCR_TYP_ENDP          0x05
 #define USB_DESCR_TYP_QUALIF        0x06
 #define USB_DESCR_TYP_SPEED         0x07
@@ -405,7 +405,7 @@
 #define USBFS_UH_T_RES              0x01      // expected handshake response type for host transmittal (SETUP/OUT): 0=ACK (ready), 1=no response, time out from device, for isochronous transactions
 
 
-/*******************************************************************************/
+///*******************************************************************************/
 /* Struct Definition */
 
 /* USB Setup Request */
@@ -471,8 +471,9 @@ typedef struct __attribute__((packed)) _USB_ENDPOINT_DESCR
     uint8_t  bDescriptorType;
     uint8_t  bEndpointAddress;
     uint8_t  bmAttributes;
-    uint8_t  wMaxPacketSizeL;
-    uint8_t  wMaxPacketSizeH;
+    uint16_t wMaxPacketSize;
+//    uint8_t  wMaxPacketSizeL;
+//    uint8_t  wMaxPacketSizeH;
     uint8_t  bInterval;
 } USB_ENDP_DESCR, *PUSB_ENDP_DESCR;
 
@@ -483,6 +484,13 @@ typedef struct __attribute__((packed)) _USB_CONFIG_DESCR_LONG
     USB_ITF_DESCR  itf_descr;
     USB_ENDP_DESCR endp_descr[ 1 ];
 } USB_CFG_DESCR_LONG, *PUSB_CFG_DESCR_LONG;
+
+/* USB string descriptor */
+typedef struct __attribute__((packed)) _USB_STRING_DESCR {
+    uint8_t bLength;
+    uint8_t bDescriptorType;
+    uint8_t string[256];
+}USB_STRING_DESCR;
 
 /* USB HUB Descriptor */
 typedef struct __attribute__((packed)) _USB_HUB_DESCR

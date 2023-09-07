@@ -38,7 +38,7 @@ SECTIONS
 		. = ALIGN(64);
 		KEEP(*(SORT_NONE(.handle_reset)))
 	} >FLASH AT>FLASH
-  
+
     .highcode : 
     {
         . = ALIGN(4);
@@ -46,7 +46,7 @@ SECTIONS
         *(.highcode.*);
 		. = ALIGN(4); 
     } >FLASH AT>FLASH
-    
+
 	.text :
 	{
 		. = ALIGN(4);

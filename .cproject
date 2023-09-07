@@ -187,12 +187,11 @@
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Debug"/>
-						<entry excluding="SLEEP.h|SLEEP.c|LED.h|LED.c|KEY.h|KEY.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="HAL"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="LIB"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Ld"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Peripheral"/>
 						<entry excluding="startup_ch32v20x_D8.S|startup_ch32v20x_D6.S" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Startup"/>
-						<entry excluding="Profile/gattprofile.h|Profile/gattprofile.c|ble_uart_service/ble_uart_service_16bit.c|ble_uart_service/ble_uart_service_same_char.c|ble_uart_service/ble_uart_service_same_16bit_char.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="User"/>
+						<entry excluding="USB_Host|Profile/gattprofile.h|Profile/gattprofile.c|ble_uart_service/ble_uart_service_16bit.c|ble_uart_service/ble_uart_service_same_char.c|ble_uart_service/ble_uart_service_same_16bit_char.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="User"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
